@@ -6,6 +6,7 @@ import { ChakraProvider, ColorModeScript } from "@chakra-ui/react";
 import { mode } from "@chakra-ui/theme-tools";
 import { extendTheme } from "@chakra-ui/theme-utils";
 import { BrowserRouter } from "react-router-dom";
+import { RecoilRoot } from "recoil";
 
 const styles = {
     global: (props) => ({
@@ -32,13 +33,15 @@ const theme = extendTheme({ config, styles, colors });
 
 ReactDOM.createRoot(document.getElementById("root")).render(
     <React.StrictMode>
-        <BrowserRouter>
-            <ChakraProvider theme={theme}>
-                <ColorModeScript
-                    initialColorMode={theme.config.initialColorMode}
-                />
-                <App />
-            </ChakraProvider>
-        </BrowserRouter>
+        <RecoilRoot>
+            <BrowserRouter>
+                <ChakraProvider theme={theme}>
+                    <ColorModeScript
+                        initialColorMode={theme.config.initialColorMode}
+                    />
+                    <App />
+                </ChakraProvider>
+            </BrowserRouter>
+        </RecoilRoot>
     </React.StrictMode>
 );

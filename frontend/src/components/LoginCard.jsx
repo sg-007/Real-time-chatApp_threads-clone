@@ -43,10 +43,11 @@ export default function LoginCard() {
                 showToast("Error", data.error, "error");
                 return;
             }
-            console.log(data);
             localStorage.setItem("user-threads", JSON.stringify(data));
             setUser(data);
-        } catch (error) {}
+        } catch (error) {
+            showToast("Error", error, "error");
+        }
     };
     return (
         <Flex align={"center"} justify={"center"}>

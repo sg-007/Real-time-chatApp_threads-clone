@@ -21,14 +21,53 @@ import {
 import { useRef, useState } from "react";
 import usePreviewImg from "../hooks/usePreviewImg";
 import { BsFillImageFill } from "react-icons/bs";
+import { useRecoilValue } from "recoil";
+import userAtom from "../atoms/userAtom";
+import useShowToast from "../hooks/useShowToast";
+
+const MAX_CHAR = 500;
 
 const CreatePost = () => {
     const { isOpen, onOpen, onClose } = useDisclosure();
     const [postText, setPostText] = useState("");
     const { handleImageChange, imgUrl, setImgUrl } = usePreviewImg();
     const imgRef = useRef(null);
+    const [remainingChar, setRemainingChar] = useState(MAX_CHAR);
+    const user = useRecoilValue(userAtom);
+    const showToast = useShowToast();
 
-    const handleTextChange = () => {};
+    const handleTextChange = (e) => {
+        const inputText = e.target.value;
+
+        if (inputText.length > MAX_CHAR) {
+            const truncatedText = inputText.slice(0, MAX_CHAR);
+            setPostText(truncatedText);
+            setRemainingChar(0);
+        } else {
+            setPostText(inputText);
+            setRemainingChar(MAX_CHAR - inputText.length);
+        }
+    };
+    const handleCreatePost = async () => {
+        const res = await fetch("/api/posts/create", {
+            method: "POST",
+            headers: {
+                "Content-Type": "application/json",
+            },
+            body: JSON.stringify({
+                postedBy: user._id,
+                text: postText,
+                img: imgUrl,
+            }),
+        });
+
+        const data = await res.json();
+        if (data.error) {
+            showToast("Error", data.error, "error");
+            return;
+        }
+        showToast("Success", "Post created successfully", "success");
+    };
 
     return (
         <>
@@ -61,7 +100,7 @@ const CreatePost = () => {
                                 m={"1"}
                                 color={"gray.800"}
                             >
-                                500/500
+                                {remainingChar}/{MAX_CHAR}
                             </Text>
                             <Input
                                 type="file"

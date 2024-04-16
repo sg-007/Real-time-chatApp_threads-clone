@@ -20,9 +20,7 @@ const createPost = async (req, res) => {
         }
 
         if (user._id.toString() !== req.user._id.toString()) {
-            return res
-                .status(401)
-                .json({ error: "Unauthorized to create post" });
+            return res.status(401).json({ error: "Unauthorized to create post" });
         }
 
         const maxLength = 500;
@@ -39,7 +37,7 @@ const createPost = async (req, res) => {
 
         const newPost = new Post({ postedBy, text, img });
         await newPost.save();
-        res.status(201).json({ message: "Post created successfully", newPost });
+        res.status(201).json(newPost);
     } catch (err) {
         res.status(500).json({ error: err.message });
         console.log("Error in createPost: ", err.message);
@@ -67,9 +65,7 @@ const deletePost = async (req, res) => {
         }
 
         if (post.postedBy.toString() !== req.user._id.toString()) {
-            return res
-                .status(401)
-                .json({ error: "Unauthorized to delete post" });
+            return res.status(401).json({ error: "Unauthorized to delete post" });
         }
         if (post.img) {
             const imgId = post.img.split("/").pop().split(".")[0];
@@ -126,7 +122,7 @@ const replyToPost = async (req, res) => {
     post.replies.push(reply);
     await post.save();
 
-    return res.status(200).json({ message: "Reply added successfully", post });
+    return res.status(200).json(post);
 };
 
 const getFeedPosts = async (req, res) => {

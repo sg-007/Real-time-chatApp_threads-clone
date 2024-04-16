@@ -13,7 +13,6 @@ import CreatePost from "./components/CreatePost";
 
 function App() {
     const user = useRecoilValue(userAtom);
-    console.log(user);
     return (
         <Container maxW="620px">
             <Header />
@@ -33,11 +32,23 @@ function App() {
                     }
                 />
                 <Route path="/auth" element={<AuthPage />} />
-                <Route path="/:username" element={<UserPage />} />
+                <Route
+                    path="/:username"
+                    element={
+                        user ? (
+                            <>
+                                <UserPage />
+                                <CreatePost />
+                            </>
+                        ) : (
+                            <UserPage />
+                        )
+                    }
+                />
                 <Route path="/:username/post/:pid" element={<PostPage />} />
             </Routes>
             {user && <LogoutButton />}
-            {user && <CreatePost/>}
+            {/* {user && <CreatePost/>} */}
         </Container>
     );
 }

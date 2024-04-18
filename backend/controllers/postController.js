@@ -108,7 +108,7 @@ const replyToPost = async (req, res) => {
         const { text } = req.body;
         const postId = req.params.id;
         const userId = req.user._id;
-        const userProfilePic = req.user.ProfilePic;
+        const userProfilePic = req.user.profilePic;
         const username = req.user.username;
 
         if (!text) {
@@ -122,7 +122,7 @@ const replyToPost = async (req, res) => {
         const reply = { userId, text, userProfilePic, username };
         post.replies.push(reply);
         await post.save();
-
+        console.log(reply);
         return res.status(200).json(reply);
     } catch (err) {
         res.status(500).json({ error: err.message });

@@ -1,4 +1,5 @@
 import User from "../models/userModel.js";
+import Post from "../models/postModel.js";
 import bcrypt from "bcryptjs";
 import generateTokenSetCookie from "../utils/helpers/generateTokenSetCookies.js";
 import { v2 as cloudinary } from "cloudinary";
@@ -78,9 +79,7 @@ const loginUser = async (req, res) => {
         );
 
         if (!user || !isPasswordCorrect)
-            return res
-                .status(400)
-                .json({ error: "Invalid username or password" });
+            return res.status(400).json({ error: "Invalid username or password" });
 
         generateTokenSetCookie(user._id, res);
 
@@ -177,9 +176,7 @@ const updateUser = async (req, res) => {
                     user.profilePic.split("/").pop().split(".")[0]
                 );
             }
-            const uploadedResponse = await cloudinary.uploader.upload(
-                profilePic
-            );
+            const uploadedResponse = await cloudinary.uploader.upload(profilePic);
             profilePic = uploadedResponse.secure_url;
         }
 
@@ -190,6 +187,17 @@ const updateUser = async (req, res) => {
         user.bio = bio || user.bio;
 
         user = await user.save();
+
+        await Post.updateMany(
+            { "replies.userId": userId },
+            {
+                $set: {
+                    "replies.$[reply].username": user.username,
+                    "replies.$[reply].userProfilePic": user.profilePic,
+                },
+            },
+            { arrayFilters: [{ "reply.userId": userId }] }
+        );
 
         user.password = null;
 

@@ -8,7 +8,7 @@ import useGetUserProfile from "../hooks/useGetUserProfile";
 import { useRecoilState } from "recoil";
 import postsAtom from "../atoms/postsAtom";
 
-export const UserPage = () => {
+const UserPage = () => {
     const { user, loading } = useGetUserProfile();
     const { username } = useParams();
     const showToast = useShowToast();
@@ -21,7 +21,6 @@ export const UserPage = () => {
             try {
                 const res = await fetch(`/api/posts/user/${username}`);
                 const data = await res.json();
-                console.log(data);
                 setPosts(data);
             } catch (error) {
                 showToast("Error", error.message, "error");
@@ -31,8 +30,7 @@ export const UserPage = () => {
             }
         };
         getPosts();
-    }, [username, showToast, setPosts]);
-    console.log("posts is here and it is recoil state", posts)
+    }, [username, showToast, setPosts, user]);
 
     if (!user && loading) {
         return (
@@ -48,9 +46,7 @@ export const UserPage = () => {
     return (
         <>
             <UserHeader user={user} />
-            {!fetchingPosts && posts.length === 0 && (
-                <h1>User has no posts.</h1>
-            )}
+            {!fetchingPosts && posts.length === 0 && <h1>User has no posts.</h1>}
 
             {fetchingPosts && (
                 <Flex justifyContent={"center"} my={12}>
@@ -64,3 +60,5 @@ export const UserPage = () => {
         </>
     );
 };
+
+export default UserPage;

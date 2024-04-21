@@ -76,6 +76,7 @@ const UserHeader = ({ user }) => {
             setUpdating(false);
         }
     };
+
     return (
         <VStack gap={4} alignItems={"start"}>
             <Flex justifyContent={"space-between"} w={"full"}>
@@ -139,12 +140,7 @@ const UserHeader = ({ user }) => {
                     <Text color={"gray.light"}>
                         {user.followers.length} followers
                     </Text>
-                    <Box
-                        w={1}
-                        h={1}
-                        bg={"gray.light"}
-                        borderRadius={"full"}
-                    ></Box>
+                    <Box w={1} h={1} bg={"gray.light"} borderRadius={"full"}></Box>
                     <Link color={"gray.light"}>instagram.com</Link>
                 </Flex>
                 <Flex>
@@ -158,10 +154,7 @@ const UserHeader = ({ user }) => {
                             </MenuButton>
                             <Portal>
                                 <MenuList bg={"gray.dark"}>
-                                    <MenuItem
-                                        bg={"gray.dark"}
-                                        onClick={copyURL}
-                                    >
+                                    <MenuItem bg={"gray.dark"} onClick={copyURL}>
                                         Copy Link
                                     </MenuItem>
                                 </MenuList>

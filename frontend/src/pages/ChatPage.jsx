@@ -17,6 +17,7 @@ import useShowToast from "../hooks/useShowToast";
 import { conversationsAtom, selectedConversationAtom } from "../atoms/messagesAtom";
 import { useRecoilState, useRecoilValue } from "recoil";
 import userAtom from "../atoms/userAtom";
+import { useSocket } from "../context/SocketContext";
 
 const ChatPage = () => {
     const [searchText, setSearchText] = useState("");
@@ -26,6 +27,27 @@ const ChatPage = () => {
     const [conversations, setConversations] = useRecoilState(conversationsAtom);
     const [selectedConversation, setSelectedConversation] = useRecoilState(selectedConversationAtom);
     const showToast = useShowToast();
+    const { socket, onlineUsers } = useSocket();
+
+    useEffect(() => {
+        socket?.on("messagesSeen", ({ conversationId }) => {
+            setConversations((prev) => {
+                const updatedConversations = prev.map((conversation) => {
+                    if (conversation._id === conversationId) {
+                        return {
+                            ...conversation,
+                            lastMessage: {
+                                ...conversation.lastMessage,
+                                seen: true,
+                            },
+                        };
+                    }
+                    return conversation;
+                });
+                return updatedConversations;
+            });
+        });
+    }, [socket, setConversations]);
 
     useEffect(() => {
         const getConversations = async () => {
@@ -36,7 +58,6 @@ const ChatPage = () => {
                     showToast("Error", data.error, "error");
                     return;
                 }
-                console.log(data);
                 setConversations(data);
             } catch (error) {
                 showToast("Error", error.message, "error");
@@ -167,7 +188,11 @@ const ChatPage = () => {
 
                     {!loadingConversations &&
                         conversations.map((conversation) => (
-                            <Conversation key={conversation._id} conversation={conversation} />
+                            <Conversation
+                                key={conversation._id}
+                                isOnline={onlineUsers.includes(conversation.participants[0]._id)}
+                                conversation={conversation}
+                            />
                         ))}
                 </Flex>
                 {!selectedConversation._id && (

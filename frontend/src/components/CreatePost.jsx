@@ -39,7 +39,7 @@ const CreatePost = () => {
     const showToast = useShowToast();
     const [loading, setLoading] = useState(false);
     const [posts, setPosts] = useRecoilState(postsAtom);
-    const username = useParams();
+    const { username } = useParams();
 
     const handleTextChange = (e) => {
         const inputText = e.target.value;

@@ -10,6 +10,7 @@ import {
     ModalContent,
     ModalHeader,
     ModalOverlay,
+    Spinner,
     useDisclosure,
 } from "@chakra-ui/react";
 import { useRef, useState } from "react";
@@ -28,10 +29,14 @@ const MessageInput = ({ setMessages }) => {
     const imageRef = useRef(null);
     const { onClose } = useDisclosure();
     const { handleImageChange, imgUrl, setImgUrl } = usePreviewImg();
+    const [isSending, setIsSending] = useState(false);
 
     const handleSendMessage = async (e) => {
         e.preventDefault();
-        if (!messageText) return;
+        if (!messageText && !imgUrl) return;
+        if (isSending) return;
+
+        setIsSending(true);
 
         try {
             const res = await fetch("/api/messages", {
@@ -42,6 +47,7 @@ const MessageInput = ({ setMessages }) => {
                 body: JSON.stringify({
                     message: messageText,
                     recipientId: selectedConversation.userId,
+                    img: imgUrl,
                 }),
             });
             const data = await res.json();
@@ -67,8 +73,11 @@ const MessageInput = ({ setMessages }) => {
                 return updatedConversations;
             });
             setMessageText("");
+            setImgUrl("");
         } catch (error) {
             showToast("Error", error.message, "error");
+        } finally {
+            setIsSending(false);
         }
     };
 
@@ -82,7 +91,7 @@ const MessageInput = ({ setMessages }) => {
                         onChange={(e) => setMessageText(e.target.value)}
                         value={messageText}
                     />
-                    <InputRightElement onClick={handleSendMessage}>
+                    <InputRightElement onClick={handleSendMessage} cursor={"pointer"}>
                         <IoSendSharp />
                     </InputRightElement>
                 </InputGroup>
@@ -107,7 +116,11 @@ const MessageInput = ({ setMessages }) => {
                             <Image src={imgUrl} />
                         </Flex>
                         <Flex justifyContent={"flex-end"} my={2}>
-                            <IoSendSharp size={24} cursor={"pointer"} />
+                            {!isSending ? (
+                                <IoSendSharp size={24} cursor={"pointer"} onClick={handleSendMessage} />
+                            ) : (
+                                <Spinner size={"md"} />
+                            )}
                         </Flex>
                     </ModalBody>
                 </ModalContent>

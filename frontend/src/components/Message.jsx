@@ -1,18 +1,20 @@
-import { Avatar, Box, Flex, Image, Text } from "@chakra-ui/react";
+import { Avatar, Box, Flex, Image, Skeleton, Text } from "@chakra-ui/react";
 import { useRecoilValue } from "recoil";
 import { selectedConversationAtom } from "../atoms/messagesAtom";
 import userAtom from "../atoms/userAtom";
 import { BsCheck2All } from "react-icons/bs";
+import { useState } from "react";
 
 const Message = ({ ownMessage, message }) => {
     const selectedConversation = useRecoilValue(selectedConversationAtom);
     const user = useRecoilValue(userAtom);
+    const [imgLoaded, setImgLoaded] = useState(false);
 
     return (
         <>
             {ownMessage ? (
                 <Flex gap={2} alignSelf={"flex-end"}>
-                    {false && (
+                    {message.text && (
                         <Flex bg={"green.800"} maxW={"350px"} p={1} borderRadius={"md"}>
                             <Text color={"white"}>{message.text}</Text>
                             <Box
@@ -25,13 +27,29 @@ const Message = ({ ownMessage, message }) => {
                             </Box>
                         </Flex>
                     )}
-                    {true && (
+                    {message.img && !imgLoaded && (
                         <Flex mt={0} w={"200px"}>
                             <Image
-                                src="https://img.freepik.com/free-vector/illustration-gallery-icon_53876-27002.jpg?w=1800&t=st=1713898495~exp=1713899095~hmac=be0df389ee9da1836f3b9f7059f1306524f96f47ecc99182448388504e15c489"
+                                src={message.img}
+                                hidden
+                                onLoad={() => setImgLoaded(true)}
                                 alt="Message Img"
                                 borderRadius={4}
                             />
+                            <Skeleton w={"200px"} h={"100px"} />
+                        </Flex>
+                    )}
+                    {message.img && imgLoaded && (
+                        <Flex mt={0} w={"200px"}>
+                            <Image src={message.img} alt="Message Img" borderRadius={4} />
+                            <Box
+                                alignSelf={"flex-end"}
+                                ml={1}
+                                color={message.seen ? "blue.400" : ""}
+                                fontWeight={"bold"}
+                            >
+                                <BsCheck2All size={16} />
+                            </Box>
                         </Flex>
                     )}
                     <Avatar src={user.profilePic} w={7} h={7} />
@@ -44,13 +62,21 @@ const Message = ({ ownMessage, message }) => {
                             {message.text}
                         </Text>
                     )}
-                    {message.img && (
-                        <Flex mt={5} w={"200px"}>
+                    {message.img && !imgLoaded && (
+                        <Flex mt={0} w={"200px"}>
                             <Image
-                                src="https://img.freepik.com/free-vector/illustration-gallery-icon_53876-27002.jpg?w=1800&t=st=1713898495~exp=1713899095~hmac=be0df389ee9da1836f3b9f7059f1306524f96f47ecc99182448388504e15c489"
+                                src={message.img}
+                                hidden
+                                onLoad={() => setImgLoaded(true)}
                                 alt="Message Img"
                                 borderRadius={4}
                             />
+                            <Skeleton w={"200px"} h={"100px"} />
+                        </Flex>
+                    )}
+                    {message.img && imgLoaded && (
+                        <Flex mt={0} w={"200px"}>
+                            <Image src={message.img} alt="Message Img" borderRadius={4} />
                         </Flex>
                     )}
                 </Flex>

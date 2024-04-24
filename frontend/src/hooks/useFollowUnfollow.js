@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import { useState } from "react";
 import { useRecoilValue } from "recoil";
 import userAtom from "../atoms/userAtom";
 import useShowToast from "./useShowToast";
@@ -15,6 +15,7 @@ const useFollowUnfollow = (user) => {
             return;
         }
         if (updating) return;
+
         setUpdating(true);
         try {
             const res = await fetch(`/api/users/follow/${user._id}`, {
@@ -36,7 +37,6 @@ const useFollowUnfollow = (user) => {
                 user.followers.push(currentUser?._id); // simulate adding of followers
             }
             setFollowing(!following);
-            console.log(data);
         } catch (error) {
             showToast("Error", error, "error");
         } finally {

@@ -68,7 +68,7 @@ const Message = ({ ownMessage, message }) => {
                                 src={message.img}
                                 hidden
                                 onLoad={() => setImgLoaded(true)}
-                                alt="Message Img"
+                                alt="Message Image"
                                 borderRadius={4}
                             />
                             <Skeleton w={"200px"} h={"100px"} />
@@ -76,7 +76,7 @@ const Message = ({ ownMessage, message }) => {
                     )}
                     {message.img && imgLoaded && (
                         <Flex mt={0} w={"200px"}>
-                            <Image src={message.img} alt="Message Img" borderRadius={4} />
+                            <Image src={message.img} alt="Message Image" borderRadius={4} />
                         </Flex>
                     )}
                 </Flex>

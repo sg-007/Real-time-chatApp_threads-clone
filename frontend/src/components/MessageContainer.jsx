@@ -34,6 +34,7 @@ const MessageContainer = () => {
                 setMessages((prevMessages) => [...prevMessages, message]);
             }
 
+            // sound is played wthen the window is not in focus
             if (!document.hasFocus()) {
                 const sound = new Audio(messageSound);
                 sound.play();
@@ -41,7 +42,7 @@ const MessageContainer = () => {
 
             setConversations((prev) => {
                 const updatedConversations = prev.map((conversation) => {
-                    if (conversation._id === selectedConversation._id) {
+                    if (conversation._id === message.conversationId) {
                         return {
                             ...conversation,
                             lastMessage: {
@@ -122,7 +123,6 @@ const MessageContainer = () => {
             p={2}
             flexDirection={"column"}
         >
-            {/* Message Header */}
             <Flex w={"full"} h={12} alignItems={"center"} gap={2}>
                 <Avatar src={selectedConversation.userProfilePic} size={"sm"} />
                 <Text alignItems={"center"} display={"flex"}>

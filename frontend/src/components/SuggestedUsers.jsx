@@ -57,18 +57,3 @@ const SuggestedUsers = () => {
 };
 
 export default SuggestedUsers;
-
-{
-    /* <Flex key={idx} gap={2} alignItems={"center"} p={1} borderRadius={"md"}>
-    <Box>
-        <SkeletonCircle size={10} />
-    </Box>
-    <Flex w={"full"} flexDirection={"column"} gap={2}>
-        <Skeleton h={"8px"} w={"80px"} />
-        <Skeleton h={"8px"} w={"90px"} />
-    </Flex>
-    <Flex>
-        <Skeleton h={"20px"} w={"60px"} />
-    </Flex>
-</Flex>; */
-}

@@ -13,13 +13,9 @@ const getUserProfile = async (req, res) => {
     try {
         let user;
         if (mongoose.Types.ObjectId.isValid(query)) {
-            user = await User.findOne({ _id: query })
-                .select("-password")
-                .select("-updatedAt");
+            user = await User.findOne({ _id: query }).select("-password").select("-updatedAt");
         } else {
-            user = await User.findOne({ username: query })
-                .select("-password")
-                .select("-updatedAt");
+            user = await User.findOne({ username: query }).select("-password").select("-updatedAt");
         }
 
         if (!user) return res.status(404).json({ error: "User not found" });
@@ -73,10 +69,7 @@ const loginUser = async (req, res) => {
     try {
         const { username, password } = req.body;
         const user = await User.findOne({ username });
-        const isPasswordCorrect = await bcrypt.compare(
-            password,
-            user?.password || ""
-        );
+        const isPasswordCorrect = await bcrypt.compare(password, user?.password || "");
 
         if (!user || !isPasswordCorrect)
             return res.status(400).json({ error: "Invalid username or password" });
@@ -114,11 +107,8 @@ const followUnfollowUser = async (req, res) => {
         const currentUser = await User.findById(req.user._id);
 
         if (id === req.user._id.toString())
-            return res
-                .status(400)
-                .json({ error: "You cannot follow/unfollow yourself" });
-        if (!userToModify || !currentUser)
-            return res.status(400).json({ error: "User not found" });
+            return res.status(400).json({ error: "You cannot follow/unfollow yourself" });
+        if (!userToModify || !currentUser) return res.status(400).json({ error: "User not found" });
 
         const isFollowing = currentUser.following.includes(id);
 
@@ -160,9 +150,7 @@ const updateUser = async (req, res) => {
         if (!user) return res.status(400).json({ error: "User not found" });
 
         if (req.params.id !== userId.toString())
-            return res
-                .status(400)
-                .json({ error: "You cannot update other users' profile" });
+            return res.status(400).json({ error: "You cannot update other users' profile" });
 
         if (password) {
             const salt = await bcrypt.genSalt(10);
@@ -172,9 +160,7 @@ const updateUser = async (req, res) => {
 
         if (profilePic) {
             if (user.profilePic) {
-                await cloudinary.uploader.destroy(
-                    user.profilePic.split("/").pop().split(".")[0]
-                );
+                await cloudinary.uploader.destroy(user.profilePic.split("/").pop().split(".")[0]);
             }
             const uploadedResponse = await cloudinary.uploader.upload(profilePic);
             profilePic = uploadedResponse.secure_url;
@@ -208,6 +194,34 @@ const updateUser = async (req, res) => {
     }
 };
 
+const getSuggestedUsers = async (req, res) => {
+    try {
+        const userId = req.user._id;
+        const usersFollowing = await User.findById(userId).select("following");
+
+        // exclude currentUser from suggested users array
+        const users = await User.aggregate([
+            {
+                $match: {
+                    _id: { $ne: userId },
+                },
+            },
+            {
+                $sample: { size: 10 },
+            },
+        ]);
+        // exclude users that current user is already following
+        const filteredUsers = users.filter((user) => !usersFollowing.following.includes(user._id));
+
+        const suggestedUsers = filteredUsers.slice(0, 4);
+
+        suggestedUsers.forEach((user) => user.password == null);
+        res.status(200).json(suggestedUsers);
+    } catch (error) {
+        res.status(500).json({ error: error.message });
+    }
+};
+
 export {
     signupUser,
     loginUser,
@@ -215,4 +229,5 @@ export {
     followUnfollowUser,
     updateUser,
     getUserProfile,
+    getSuggestedUsers,
 };

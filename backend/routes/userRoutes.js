@@ -8,6 +8,7 @@ import {
     updateUser,
     getUserProfile,
     getSuggestedUsers,
+    freezeAccount,
 } from "../controllers/userController.js";
 
 const router = express.Router();
@@ -19,5 +20,6 @@ router.post("/login", loginUser);
 router.post("/logout", logoutUser);
 router.post("/follow/:id", protectRoute, followUnfollowUser);
 router.put("/update/:id", protectRoute, updateUser);
+router.put("/freeze", protectRoute, freezeAccount);
 
 export default router;
